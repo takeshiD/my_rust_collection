@@ -37,6 +37,7 @@ impl<T: Clone> LinkedList<T> {
             new_node.borrow_mut().next = self.head.clone();
             self.head = Some(new_node);
         }
+        self.len += 1;
     }
     fn push_back(&mut self, elt: T) {
         let new_node = Node {
@@ -54,9 +55,16 @@ impl<T: Clone> LinkedList<T> {
             }
             self.tail = Some(new_node);
         }
+        self.len += 1;
     }
     fn pop_front(&mut self) -> Option<T> {
-        unimplemented!()
+        if self.head.is_none() {
+            None
+        } else {
+            let head = self.head.clone().unwrap();
+            self.head = head.clone().borrow().next.clone();
+            Some(head.clone().borrow().data.clone())
+        }
     }
     fn pop_back(&mut self) -> Option<T> {
         unimplemented!()
@@ -68,10 +76,10 @@ impl<T: Clone> LinkedList<T> {
         unimplemented!()
     }
     fn len(&self) -> usize {
-        unimplemented!()
+        self.len.clone()
     }
     fn is_empty(&self) -> bool {
-        unimplemented!()
+        self.len() == 0
     }
 }
 
@@ -132,7 +140,23 @@ mod tests{
     }
     #[test]
     fn test_pop_front(){
-        unimplemented!();
+        let mut list = LinkedList::new();
+        {
+            let front = list.pop_front();
+            assert!(front.is_none());
+        }
+        let n = 5;
+        for i in 0..n {
+            list.push_back(i);
+        }
+        for i in 0..n {
+            let front = list.pop_front();
+            assert_eq!(front, Some(i));
+        }
+        {
+            let front = list.pop_front();
+            assert!(front.is_none());
+        }
     }
     #[test]
     fn test_push_back(){
