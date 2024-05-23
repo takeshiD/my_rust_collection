@@ -24,7 +24,19 @@ impl<T: Clone> LinkedList<T> {
         }
     }
     fn push_front(&mut self, elt: T) {
-        unimplemented!()
+        let new_node = Node {
+            data: elt,
+            next: None,
+        };
+        if self.head.is_none() {
+            let new_node = Rc::new(RefCell::new(new_node));
+            self.head = Some(new_node.clone());
+            self.tail = Some(new_node);
+        } else {
+            let new_node = Rc::new(RefCell::new(new_node));
+            new_node.borrow_mut().next = self.head.clone();
+            self.head = Some(new_node);
+        }
     }
     fn push_back(&mut self, elt: T) {
         let new_node = Node {
@@ -37,10 +49,10 @@ impl<T: Clone> LinkedList<T> {
             self.tail = Some(new_node);
         } else {
             let new_node = Rc::new(RefCell::new(new_node));
-            // let prev_node = self.tail.take();
             if let Some(tail) = &mut self.tail {
-                tail.borrow_mut().next = Some(new_node);
+                tail.borrow_mut().next = Some(new_node.clone());
             }
+            self.tail = Some(new_node);
         }
     }
     fn pop_front(&mut self) -> Option<T> {
@@ -100,7 +112,23 @@ mod tests{
     }
     #[test]
     fn test_push_front(){
-        unimplemented!();
+        let mut list = LinkedList::new();
+        list.push_front(1);
+        {
+            let head = list.head.clone().unwrap();
+            let tail = list.tail.clone().unwrap();
+            assert!(std::ptr::eq(head.as_ptr(), tail.as_ptr()));
+            assert_eq!(head.borrow().data, 1);
+            assert_eq!(tail.borrow().data, 1);
+        }
+        list.push_front(2);
+        {
+            let head = list.head.clone().unwrap();
+            let tail = list.tail.clone().unwrap();
+            assert!(!std::ptr::eq(head.as_ptr(), tail.as_ptr()));
+            assert_eq!(head.borrow().data, 2);
+            assert_eq!(tail.borrow().data, 1);
+        }
     }
     #[test]
     fn test_pop_front(){
@@ -110,11 +138,21 @@ mod tests{
     fn test_push_back(){
         let mut list = LinkedList::new();
         list.push_back(1);
-        let head = list.head.unwrap();
-        let tail = list.tail.unwrap();
-        assert!(std::ptr::eq(head, tail));
-        // println!("head:{:p}", head);
-        // println!("tail:{:p}", tail);
+        {
+            let head = list.head.clone().unwrap();
+            let tail = list.tail.clone().unwrap();
+            assert!(std::ptr::eq(head.as_ptr(), tail.as_ptr()));
+            assert_eq!(head.borrow().data, 1);
+            assert_eq!(tail.borrow().data, 1);
+        }
+        list.push_back(2);
+        {
+            let head = list.head.clone().unwrap();
+            let tail = list.tail.clone().unwrap();
+            assert!(!std::ptr::eq(head.as_ptr(), tail.as_ptr()));
+            assert_eq!(head.borrow().data, 1);
+            assert_eq!(tail.borrow().data, 2);
+        }
     }
     #[test]
     fn test_pop_back(){
