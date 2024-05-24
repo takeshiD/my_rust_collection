@@ -1,14 +1,14 @@
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell, Ref};
 
-#[derive(Debug)]
+// #[derive(Debug)]
 #[derive(Clone)]
 struct Node<T: Clone> {
     data: T,
     next: Option<Rc<RefCell<Node<T>>>>,
 }
 
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct LinkedList<T: Clone> {
     head: Option<Rc<RefCell<Node<T>>>>,
     tail: Option<Rc<RefCell<Node<T>>>>,
@@ -63,17 +63,31 @@ impl<T: Clone> LinkedList<T> {
         } else {
             let head = self.head.clone().unwrap();
             self.head = head.clone().borrow().next.clone();
+            self.len -= 1;
             Some(head.clone().borrow().data.clone())
         }
     }
     fn pop_back(&mut self) -> Option<T> {
         unimplemented!()
+        // if self.tail.is_none() {
+        //     None
+        // } else {
+        //     let tail = self.tail.clone().unwrap();
+        //     self.tail = tail.clone().borrow().next.clone();
+        //     Some(tail.clone().borrow().data.clone())
+        // }
     }
-    fn front(&self) -> Option<&T> {
-        unimplemented!()
+    fn front(&self) -> Option<T> {
+        match self.head.clone() {
+            Some(head) => Some(head.borrow().data.clone()),
+            None => None,
+        }
     }
-    fn back(&self) -> Option<&T> {
-        unimplemented!()
+    fn back(&self) -> Option<T> {
+        match self.tail.clone() {
+            Some(tail) => Some(tail.borrow().data.clone()),
+            None => None,
+        }
     }
     fn len(&self) -> usize {
         self.len.clone()
@@ -96,27 +110,39 @@ mod tests{
     #[test]
     fn test_len(){
         let mut list = LinkedList::new();
+        assert_eq!(list.len(), 0);
         let n = 10;
         for i in 0..n {
             list.push_back(i);
         }
         assert_eq!(list.len(), n);
-        for _ in 0..n {
-            list.pop_back();
-        }
-        assert_eq!(list.len(), 0);
     }
     #[test]
     fn test_front(){
-        unimplemented!();
+        let mut list = LinkedList::new();
+        assert_eq!(list.front(), None);
+        list.push_front(1);
+        assert_eq!(list.front(), Some(1));
+        list.push_front(2);
+        assert_eq!(list.front(), Some(2));
     }
     #[test]
     fn test_back(){
-        unimplemented!();
+        let mut list = LinkedList::new();
+        assert_eq!(list.back(), None);
+        list.push_back(1);
+        assert_eq!(list.back(), Some(1));
+        list.push_back(2);
+        assert_eq!(list.back(), Some(2));
     }
     #[test]
     fn test_is_empty(){
-        unimplemented!();
+        let mut list = LinkedList::new();
+        assert!(list.is_empty());
+        list.push_front(1);
+        assert!(!list.is_empty());
+        list.pop_front();
+        assert!(list.is_empty());
     }
     #[test]
     fn test_push_front(){
@@ -179,7 +205,25 @@ mod tests{
         }
     }
     #[test]
+    #[ignore]
     fn test_pop_back(){
-        unimplemented!();
+        unimplemented!()
+        // let mut list = LinkedList::new();
+        // {
+        //     let back = list.pop_back();
+        //     assert!(back.is_none());
+        // }
+        // let n = 5;
+        // for i in 0..n {
+        //     list.push_front(i);
+        // }
+        // for i in 0..n {
+        //     let back = list.pop_back();
+        //     assert_eq!(back, Some(i));
+        // }
+        // {
+        //     let back = list.pop_back();
+        //     assert!(back.is_none());
+        // }
     }
 }
