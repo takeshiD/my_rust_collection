@@ -1,29 +1,34 @@
 use std::rc::Rc;
 use std::cell::{RefCell, Ref};
+use std::fmt;
 
-// #[derive(Debug)]
 #[derive(Clone)]
 struct Node<T: Clone> {
     data: T,
     next: Option<Rc<RefCell<Node<T>>>>,
 }
 
-// #[derive(Debug)]
 pub struct LinkedList<T: Clone> {
     head: Option<Rc<RefCell<Node<T>>>>,
     tail: Option<Rc<RefCell<Node<T>>>>,
     len: usize,
 }
 
+impl<T: Clone> fmt::Display for LinkedList<T>{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "LinkedList({} elements)", self.len())
+    }
+}
+
 impl<T: Clone> LinkedList<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         LinkedList {
             head: None,
             tail: None,
             len: 0,
         }
     }
-    fn push_front(&mut self, elt: T) {
+    pub fn push_front(&mut self, elt: T) {
         let new_node = Node {
             data: elt,
             next: None,
@@ -39,7 +44,7 @@ impl<T: Clone> LinkedList<T> {
         }
         self.len += 1;
     }
-    fn push_back(&mut self, elt: T) {
+    pub fn push_back(&mut self, elt: T) {
         let new_node = Node {
             data: elt,
             next: None,
@@ -57,7 +62,7 @@ impl<T: Clone> LinkedList<T> {
         }
         self.len += 1;
     }
-    fn pop_front(&mut self) -> Option<T> {
+    pub fn pop_front(&mut self) -> Option<T> {
         if self.head.is_none() {
             None
         } else {
@@ -77,22 +82,22 @@ impl<T: Clone> LinkedList<T> {
         //     Some(tail.clone().borrow().data.clone())
         // }
     }
-    fn front(&self) -> Option<T> {
+    pub fn front(&self) -> Option<T> {
         match self.head.clone() {
             Some(head) => Some(head.borrow().data.clone()),
             None => None,
         }
     }
-    fn back(&self) -> Option<T> {
+    pub fn back(&self) -> Option<T> {
         match self.tail.clone() {
             Some(tail) => Some(tail.borrow().data.clone()),
             None => None,
         }
     }
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len.clone()
     }
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 }
